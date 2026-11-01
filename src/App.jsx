@@ -22,8 +22,9 @@ import {
 
 const STORAGE_KEY = 'discord_cleaner_token';
 
-// Script extrator rápido para navegador do celular
-const BOOKMARKLET_CODE = `javascript:(function(){try{let t;window.webpackChunkdiscord_app.push([[Math.random()],{},(r)=>{for(const m of Object.keys(r.c)){if(r.c[m]?.exports?.default?.getToken!==undefined){t=r.c[m].exports.default.getToken();}}}]);if(!t){t=(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken();}if(t){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);}prompt("Seu Token do Discord foi copiado com sucesso! Caso necessario, copie abaixo:",t);}else{alert("Faca login em discord.com/app antes de rodar!");}}catch(e){alert("Abra discord.com/app logado no navegador primeiro.");}})();`;
+// Bookmarklet — ao rodar no discord.com redireciona de volta ao nosso site com o token
+const _ORIGIN = window.location.origin;
+const BOOKMARKLET_CODE = `javascript:(function(){try{let t;window.webpackChunkdiscord_app.push([[Math.random()],{},(r)=>{for(const m of Object.keys(r.c)){if(r.c[m]?.exports?.default?.getToken!==undefined){t=r.c[m].exports.default.getToken();}}}]);if(!t){t=(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken();}if(t){window.location.href='${_ORIGIN}/?token='+encodeURIComponent(t);}else{alert('Faca login em discord.com primeiro!');}}catch(e){alert('Abra discord.com logado antes.');}})();`;
 
 
 function getAvatarUrl(user) {
@@ -1102,6 +1103,20 @@ function TokenHelperModal({
         {/* Conteúdo Aba 2: Extrator no Celular — fluxo QR Code */}
         {tab === 'bookmarklet' && (
           <div className="space-y-3.5 text-xs text-[#dbdee1]">
+            {/* Botão rápido para /grab */}
+            <a
+              href="/grab"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between w-full p-3.5 rounded-xl bg-[#23a55a]/15 border border-[#23a55a]/30 hover:bg-[#23a55a]/25 transition-colors text-left"
+            >
+              <div>
+                <p className="text-xs font-bold text-white">⚡ Modo automático</p>
+                <p className="text-[11px] text-[#949ba4]">Abre a página do extrator — ela só toca em 1 botão</p>
+              </div>
+              <ChevronDown className="w-4 h-4 text-[#23a55a] -rotate-90 shrink-0" />
+            </a>
+
             {/* Banner principal */}
             <div className="bg-[#5865f2]/10 border border-[#5865f2]/25 rounded-xl p-3 space-y-1">
               <p className="font-bold text-white flex items-center gap-1.5">
