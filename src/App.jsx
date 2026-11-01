@@ -17,6 +17,7 @@ import {
   Check,
   Smartphone,
   Share2,
+  QrCode,
 } from 'lucide-react';
 
 const STORAGE_KEY = 'discord_cleaner_token';
@@ -24,8 +25,6 @@ const STORAGE_KEY = 'discord_cleaner_token';
 // Script extrator rápido para navegador do celular
 const BOOKMARKLET_CODE = `javascript:(function(){try{let t;window.webpackChunkdiscord_app.push([[Math.random()],{},(r)=>{for(const m of Object.keys(r.c)){if(r.c[m]?.exports?.default?.getToken!==undefined){t=r.c[m].exports.default.getToken();}}}]);if(!t){t=(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken();}if(t){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);}prompt("Seu Token do Discord foi copiado com sucesso! Caso necessario, copie abaixo:",t);}else{alert("Faca login em discord.com/app antes de rodar!");}}catch(e){alert("Abra discord.com/app logado no navegador primeiro.");}})();`;
 
-// Script Eruda para inspecionar requisições no celular
-const ERUDA_CODE = `javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/eruda';document.body.appendChild(s);s.onload=function(){eruda.init();eruda.show();};})();`;
 
 function getAvatarUrl(user) {
   if (!user) return 'https://cdn.discordapp.com/embed/avatars/0.png';
@@ -52,7 +51,6 @@ export default function App() {
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [tokenModalTab, setTokenModalTab] = useState('magic'); // 'magic' | 'bookmarklet' | 'pc'
   const [copiedBookmarklet, setCopiedBookmarklet] = useState(false);
-  const [copiedEruda, setCopiedEruda] = useState(false);
   const [copiedShareLink, setCopiedShareLink] = useState(false);
   const [generatorToken, setGeneratorToken] = useState('');
   const [copiedGeneratedLink, setCopiedGeneratedLink] = useState(false);
@@ -482,8 +480,6 @@ export default function App() {
             onClose={() => setShowTokenModal(false)}
             copiedBookmarklet={copiedBookmarklet}
             onCopyBookmarklet={() => copyText(BOOKMARKLET_CODE, setCopiedBookmarklet)}
-            copiedEruda={copiedEruda}
-            onCopyEruda={() => copyText(ERUDA_CODE, setCopiedEruda)}
             generatorToken={generatorToken}
             setGeneratorToken={setGeneratorToken}
             copiedGeneratedLink={copiedGeneratedLink}
@@ -997,8 +993,6 @@ function TokenHelperModal({
   onClose,
   copiedBookmarklet,
   onCopyBookmarklet,
-  copiedEruda,
-  onCopyEruda,
   generatorToken,
   setGeneratorToken,
   copiedGeneratedLink,
@@ -1105,17 +1099,48 @@ function TokenHelperModal({
           </div>
         )}
 
-        {/* Conteúdo Aba 2: Extrator no Celular (Bookmarklet) */}
+        {/* Conteúdo Aba 2: Extrator no Celular — fluxo QR Code */}
         {tab === 'bookmarklet' && (
           <div className="space-y-3.5 text-xs text-[#dbdee1]">
-            <p className="text-[#949ba4]">
-              Se ela quiser extrair o token <strong>diretamente pelo celular</strong> usando o Chrome ou Safari:
-            </p>
+            {/* Banner principal */}
+            <div className="bg-[#5865f2]/10 border border-[#5865f2]/25 rounded-xl p-3 space-y-1">
+              <p className="font-bold text-white flex items-center gap-1.5">
+                <QrCode className="w-4 h-4 text-[#5865f2]" />
+                Sem precisar saber a senha — Login por QR Code
+              </p>
+              <p className="text-[#949ba4] leading-relaxed">
+                O Discord tem uma opção de entrar escaneando um QR code com o próprio app. Ela não precisa digitar nada.
+              </p>
+            </div>
 
-            <div className="bg-[#1e1f22] rounded-xl p-3 border border-[#383a40] space-y-2.5">
+            {/* Passo a passo */}
+            <div className="bg-[#1e1f22] rounded-xl p-3 border border-[#383a40] space-y-3">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#b5bac1]">Passo a passo no celular dela:</p>
+              <ol className="space-y-2.5 text-[#dbdee1]">
+                <li className="flex gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#5865f2] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                  <span>No <strong className="text-white">Safari</strong> do celular dela, abra <span className="text-[#5865f2] font-semibold">discord.com</span> e toque em <strong className="text-white">"Entrar"</strong>.</span>
+                </li>
+                <li className="flex gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#5865f2] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                  <span>Na tela de login, toque em <strong className="text-white">"Fazer login com código QR"</strong> (aparece abaixo do botão azul).</span>
+                </li>
+                <li className="flex gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#5865f2] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                  <span>No <strong className="text-white">app do Discord</strong> já instalado, vá em <strong className="text-white">Perfil → Scan de QR Code</strong> e escaneie o código na tela.</span>
+                </li>
+                <li className="flex gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#23a55a] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+                  <span>Pronto! Ela está logada no Safari <strong className="text-white">sem digitar senha</strong>. Agora copie o código abaixo e rode na barra de endereço do Safari.</span>
+                </li>
+              </ol>
+            </div>
+
+            {/* Bookmarklet como link salvável */}
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-white text-[11px] uppercase tracking-wider">
-                  Extrator de 1 Toque
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#b5bac1]">
+                  Extrator (após entrar no Discord Web)
                 </span>
                 <button
                   type="button"
@@ -1123,47 +1148,17 @@ function TokenHelperModal({
                   className="px-2.5 py-1 rounded-lg bg-[#5865f2] hover:bg-[#4752c4] text-white text-[11px] font-semibold flex items-center gap-1"
                 >
                   {copiedBookmarklet ? (
-                    <>
-                      <Check className="w-3.5 h-3.5" />
-                      <span>Copiado!</span>
-                    </>
+                    <><Check className="w-3.5 h-3.5" /><span>Copiado!</span></>
                   ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copiar Código</span>
-                    </>
+                    <><Copy className="w-3.5 h-3.5" /><span>Copiar Código</span></>
                   )}
                 </button>
               </div>
-
-              <ol className="list-decimal pl-4 space-y-1.5 text-[#b5bac1]">
-                <li>Clique no botão acima para copiar o código.</li>
-                <li>
-                  No navegador do celular (Chrome ou Safari), abra{' '}
-                  <span className="text-[#5865f2] font-semibold">discord.com/app</span> e entre na conta.
-                </li>
-                <li>
-                  Na barra de endereço do navegador, apague tudo, digite a palavra{' '}
-                  <code className="text-white bg-[#2b2d31] px-1 py-0.5 rounded font-bold">javascript:</code>{' '}
-                  e cole o código logo em seguida.
-                </li>
-                <li>Dê Enter. Seu token aparecerá na tela copiado na hora!</li>
-              </ol>
-            </div>
-
-            {/* Alternativa Eruda */}
-            <div className="pt-1 border-t border-[#383a40] space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-[#949ba4]">Opção B: Abrir Console Móvel (Eruda)</span>
-                <button
-                  type="button"
-                  onClick={onCopyEruda}
-                  className="text-[#5865f2] hover:underline flex items-center gap-1 text-[11px]"
-                >
-                  {copiedEruda ? <Check className="w-3 h-3 text-[#23a55a]" /> : <Copy className="w-3 h-3" />}
-                  <span>{copiedEruda ? 'Copiado!' : 'Copiar Eruda'}</span>
-                </button>
-              </div>
+              <p className="text-[10px] text-[#80848e] leading-relaxed">
+                Com discord.com aberto no Safari, toque na barra de endereço, apague o URL, digite{' '}
+                <code className="text-white bg-[#1e1f22] px-1 rounded font-mono">javascript:</code>{' '}
+                e cole o código copiado. Dê Enter — o token aparece na tela.
+              </p>
             </div>
           </div>
         )}
